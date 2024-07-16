@@ -4,7 +4,7 @@ const path = require("path");
 
 const ErrorHandler = require("../utils/errorHandler");
 
-const User = require("../models/userModel");
+const User = require("../models/user.model");
 
 const sendToken = require("../utils/jwtToken");
 
