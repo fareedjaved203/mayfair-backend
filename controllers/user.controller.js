@@ -73,7 +73,7 @@ const registerUser = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    return next(new ErrorHandler(error.message, 400));
+    return next(new ErrorHandler(error.message, 500));
   }
 };
 
@@ -89,7 +89,10 @@ const verifyOTP = async (req, res, next) => {
         await OTP.findOneAndDelete({ email: userObj?.email });
         sendToken(newUser, 201, res);
       } else {
-        return next(new ErrorHandler("Invalid OTP", 400));
+        res.status(400).json({
+          success: false,
+          message: "Invalid OTP",
+        });
       }
     }
   } catch (error) {
@@ -103,23 +106,32 @@ const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return next(new ErrorHandler("Please Enter Email and Password"));
+      res.status(404).json({
+        success: false,
+        message: "Please Enter Email and Password",
+      });
     }
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      return next(new ErrorHandler("Invalid Email or Password", 401));
+      res.status(401).json({
+        success: false,
+        message: "Invalid Email/Password",
+      });
     }
 
     const isPasswordMatched = await user.comparePassword(password);
 
     if (!isPasswordMatched) {
-      return next(new ErrorHandler("Invalid Email or Password", 401));
+      res.status(401).json({
+        success: false,
+        message: "Invalid Email/Password",
+      });
     }
 
     sendToken(user, 200, res);
   } catch (error) {
-    return next(new ErrorHandler(error, 404));
+    return next(new ErrorHandler(error, 500));
   }
 };
 
