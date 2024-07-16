@@ -6,6 +6,8 @@ const ErrorHandler = require("../utils/errorHandler");
 
 const User = require("../models/user.model");
 
+const OTP = require("../models/registerOtp.model");
+
 const sendToken = require("../utils/jwtToken");
 
 const sendEmail = require("../utils/sendEmail");
@@ -58,10 +60,17 @@ const registerUser = async (req, res, next) => {
       return next(new ErrorHandler(error.message, 500));
     }
 
-    res
-      .status(200)
-      .cookie("user", JSON.stringify(user), { maxAge: 900000, httpOnly: true })
-      .json({ message: "OTP sent to your email, please verify", otp });
+    const registrationOtp = await OTP.create({ email, otp });
+
+    if (registrationOtp) {
+      res
+        .status(200)
+        .cookie("user", JSON.stringify(user), {
+          maxAge: 900000,
+          httpOnly: true,
+        })
+        .json({ message: "OTP sent to your email, please verify", otp });
+    }
   } catch (error) {
     console.log(error);
     return next(new ErrorHandler(error.message, 400));
@@ -71,13 +80,13 @@ const registerUser = async (req, res, next) => {
 const verifyOTP = async (req, res, next) => {
   try {
     const { otp } = req.body;
-
     if (otp) {
       const { user } = req.cookies;
       const userObj = JSON.parse(user);
       const userVerification = await User.findOne({ email: userObj?.email });
       if (userVerification.otp == otp) {
         const newUser = await User.create(user);
+        await OTP.findOneAndDelete({ email: userObj?.email });
         sendToken(newUser, 201, res);
       } else {
         return next(new ErrorHandler("Invalid OTP", 400));
