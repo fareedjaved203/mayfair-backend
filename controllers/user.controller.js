@@ -6,7 +6,7 @@ const ErrorHandler = require("../utils/errorHandler");
 
 const User = require("../models/user.model");
 
-const OTP = require("../models/registerOtp.model");
+const Otp = require("../models/registerOtp.model");
 
 const sendToken = require("../utils/jwtToken");
 
@@ -60,17 +60,21 @@ const registerUser = async (req, res, next) => {
       return next(new ErrorHandler(error.message, 500));
     }
 
-    const registrationOtp = await OTP.create({ email, otp });
+    const presentOTPEmail = await Otp.findOne({ email });
 
-    if (registrationOtp) {
-      res
-        .status(200)
-        .cookie("user", JSON.stringify(user), {
-          maxAge: 900000,
-          httpOnly: true,
-        })
-        .json({ message: "OTP sent to your email, please verify", otp });
+    if (presentOTPEmail) {
+      presentOTPEmail.otp = otp;
+      await presentOTPEmail.save();
+    } else {
+      await Otp.create({ email, otp });
     }
+
+    res
+      .status(200)
+      .cookie("user", JSON.stringify(user), {
+        maxAge: 900000,
+      })
+      .json({ message: "OTP sent to your email, please verify", otp });
   } catch (error) {
     console.log(error);
     return next(new ErrorHandler(error.message, 500));
@@ -83,10 +87,10 @@ const verifyOTP = async (req, res, next) => {
     if (otp) {
       const { user } = req.cookies;
       const userObj = JSON.parse(user);
-      const userVerification = await User.findOne({ email: userObj?.email });
+      const userVerification = await Otp.findOne({ email: userObj?.email });
       if (userVerification.otp == otp) {
-        const newUser = await User.create(user);
-        await OTP.findOneAndDelete({ email: userObj?.email });
+        const newUser = await User.create(userObj);
+        await Otp.findOneAndDelete({ email: userObj?.email });
         sendToken(newUser, 201, res);
       } else {
         res.status(400).json({
@@ -118,18 +122,18 @@ const loginUser = async (req, res, next) => {
         success: false,
         message: "Invalid Email/Password",
       });
+    } else {
+      const isPasswordMatched = await user.comparePassword(password);
+
+      if (!isPasswordMatched) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid Email/Password",
+        });
+      }
+
+      sendToken(user, 200, res);
     }
-
-    const isPasswordMatched = await user.comparePassword(password);
-
-    if (!isPasswordMatched) {
-      res.status(401).json({
-        success: false,
-        message: "Invalid Email/Password",
-      });
-    }
-
-    sendToken(user, 200, res);
   } catch (error) {
     return next(new ErrorHandler(error, 500));
   }

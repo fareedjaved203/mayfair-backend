@@ -5,11 +5,12 @@ const { ApiError } = require("../utils/ApiError");
 const isAuthenticatedUser = async (req, res, next) => {
   try {
     const token =
-      req.cookies?.accessToken ||
-      req.header("Authorization")?.replace("Bearer ", "");
+      req.cookies?.token || req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      throw new ApiError(401, "Unauthorized Access");
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized Access" });
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -17,13 +18,13 @@ const isAuthenticatedUser = async (req, res, next) => {
     const user = await User.findById(decodedToken?.id).select("-password");
 
     if (!user) {
-      throw new ApiError(401, "Invalid Access Token");
+      return res.status(401).json({ success: false, message: "Invalid Token" });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    throw new ApiError(401, error?.message || "Invalid access token");
+    return res.status(401).json({ success: false, message: "Invalid Token" });
   }
 };
 
@@ -32,9 +33,9 @@ const authorizeRoles = (...roles) => {
     const user = await User.findById(req.user.id);
     if (user) {
       if (!roles.includes(user.role)) {
-        return next(
-          new ApiError(403, `You are not allowed to access this resource`)
-        );
+        return res
+          .status(403)
+          .json({ success: false, message: "Not Allowed to Access this Page" });
       }
     }
     next();
