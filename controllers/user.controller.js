@@ -71,7 +71,7 @@ const registerUser = async (req, res, next) => {
       await Otp.create({ email, otp });
     }
 
-    res
+    return res
       .status(200)
       .cookie("user", JSON.stringify(user), {
         maxAge: 86400000,
@@ -87,7 +87,7 @@ const verifyOTP = async (req, res, next) => {
   try {
     const { otp } = req.body;
     if (otp) {
-      const { user } = req.cookies;
+      const { user } = req.cookies || req.header("Otp");
       const userObj = JSON.parse(user);
       const userVerification = await Otp.findOne({ email: userObj?.email });
       if (userVerification.otp == otp) {
