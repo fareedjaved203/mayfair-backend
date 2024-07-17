@@ -29,7 +29,9 @@ const registerUser = async (req, res, next) => {
     const emailAlreadyPresent = await User.findOne({ email });
 
     if (emailAlreadyPresent) {
-      return next(new ErrorHandler("Email Already Exists", 409));
+      return res
+        .status(409)
+        .json({ success: false, message: "Email already present" });
     }
 
     const otp = generateOTP();
@@ -57,7 +59,7 @@ const registerUser = async (req, res, next) => {
       });
     } catch (error) {
       console.log(error);
-      return next(new ErrorHandler(error.message, 500));
+      return res.status(500).json({ message: error });
     }
 
     const presentOTPEmail = await Otp.findOne({ email });
@@ -77,7 +79,7 @@ const registerUser = async (req, res, next) => {
       .json({ message: "OTP sent to your email, please verify", otp });
   } catch (error) {
     console.log(error);
-    return next(new ErrorHandler(error.message, 500));
+    return res.status(500).json({ message: error });
   }
 };
 
