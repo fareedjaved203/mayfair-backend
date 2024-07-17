@@ -103,7 +103,10 @@ const verifyOTP = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    return next(new ErrorHandler(error.message, 400));
+    res.status(400).json({
+      success: false,
+      message: error,
+    });
   }
 };
 
