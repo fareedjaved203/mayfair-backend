@@ -74,7 +74,7 @@ const registerUser = async (req, res, next) => {
     res
       .status(200)
       .cookie("user", JSON.stringify(user), {
-        maxAge: 900000,
+        maxAge: 86400000,
       })
       .json({ message: "OTP sent to your email, please verify", otp });
   } catch (error) {
