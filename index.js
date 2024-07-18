@@ -17,8 +17,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const user = require("./routes/user.routes");
+const property = require("./routes/property.routes");
 
 app.use("/api/v1/user", user);
+app.use("/api/v1/property", property);
 
 app.listen(port, () => {
   console.log(`server is running at http://localhost:${port}`);

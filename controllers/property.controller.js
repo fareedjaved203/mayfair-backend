@@ -1,4 +1,5 @@
 const Property = require("../models/property.model");
+const User = require("../models/user.model");
 
 const addProperty = async (req, res, next) => {
   try {
@@ -91,10 +92,34 @@ const updateProperty = async (req, res, next) => {
   }
 };
 
+const shortlistProperties = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).populate("shortlist");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      properties: user.shortlist,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   addProperty,
   getAllProperties,
   getProperty,
   deleteProperty,
   updateProperty,
+  shortlistProperties,
 };
