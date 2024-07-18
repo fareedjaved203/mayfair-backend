@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "landlord", "tenant"],
       default: "tenant",
     },
+    shortlist: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Property",
+    },
     otp: String,
     companyName: {
       type: String,
