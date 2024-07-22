@@ -7,64 +7,81 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: [true, "Please Enter The Title"],
     },
-    propertyImage: {
-      type: String,
-    },
-    totalRooms: {
-      type: Number,
-    },
-    rooms: [
-      {
-        transaction: {
-          type: String,
-          enum: ["buy", "rent", "sell"],
-          default: "buy",
-        },
-        status: {
-          type: String,
-          enum: ["coming soon", "available", "let agreed"],
-          default: "available",
-        },
-        roomImages: [
-          {
-            type: String,
-          },
-        ],
-        bedroom: {
-          type: Number,
-        },
-        squareft: {
-          type: Number,
-        },
-        price: {
-          type: Number,
-        },
-      },
-    ],
     propertyType: {
       type: String,
       enum: ["commercial", "residential"],
     },
-    buildingName: {
+    propertyImages: [
+      {
+        type: String,
+      },
+    ],
+    propertySubtype: {
       type: String,
     },
-    street: {
+    propertyOption: {
       type: String,
+      enum: ["buy", "rent"],
+      default: "rent",
     },
-    addressline2: {
-      type: String,
+    residentialPropertyDetails: {
+      status: {
+        type: String,
+      },
+      bedrooms: {
+        type: Number,
+      },
+      bathrooms: {
+        type: Number,
+      },
+      description: {
+        type: String,
+      },
+      size: {
+        type: Number,
+      },
+      price: {
+        type: Number,
+      },
     },
-    town: {
-      type: String,
+    propertyAddress: {
+      buildingNumber: String,
+      street: String,
+      city: String,
+      state: String,
+      zip: String,
+      location: String,
     },
-    country: {
-      type: String,
+    propertyDetails: {
+      squareft: Number,
+      startSize: Number,
+      endSize: Number,
+      propertyLocation: String,
     },
-    zipCode: {
-      type: String,
+    amenities: [
+      {
+        type: String,
+      },
+    ],
+    propertyDescription: String,
+    facts: {
+      title: String,
+      description: String,
     },
     location: {
-      type: String,
+      latitude: String,
+      longitude: String,
+      transportOption: [
+        {
+          name: String,
+          distance: String,
+          type: String,
+        },
+      ],
+    },
+    specialOffers: {
+      title: String,
+      description: String,
     },
   },
   { timestamps: true }

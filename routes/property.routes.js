@@ -14,17 +14,12 @@ const {
 
 const router = express.Router();
 
-router.post(
-  "/property",
-  isAuthenticatedUser,
-  authorizeRoles("admin"),
-  addProperty
-);
-router.get("/properties", getAllProperties);
-router.get("/property/:id", getProperty);
-router.delete("/property/:id", isAuthenticatedUser, deleteProperty);
-router.put("/property/:id", isAuthenticatedUser, updateProperty);
+router.post("/", isAuthenticatedUser, authorizeRoles("admin"), addProperty);
+router.get("/", getAllProperties);
+router.get("/:id", getProperty);
+router.delete("/:id", isAuthenticatedUser, deleteProperty);
+router.put("/:id", isAuthenticatedUser, updateProperty);
 
-router.get("/shortlist-properties", isAuthenticatedUser, shortlistProperties);
+router.get("/shortlisted", isAuthenticatedUser, shortlistProperties);
 
 module.exports = router;
