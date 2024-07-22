@@ -115,7 +115,67 @@ const shortlistProperties = async (req, res, next) => {
   }
 };
 
+const addPropertyToShortlist = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const propertyId = req.body.propertyId;
+    if (!user.shortlist.includes(propertyId)) {
+      user.shortlist.push(propertyId);
+      await user.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Property added to shortlist",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const removePropertyFromShortlist = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const propertyId = req.body.propertyId;
+    user.shortlist = user.shortlist.filter(
+      (property) => property.toString() !== propertyId
+    );
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Property removed from shortlist",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
+  addPropertyToShortlist,
+  removePropertyFromShortlist,
   addProperty,
   getAllProperties,
   getProperty,

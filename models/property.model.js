@@ -7,9 +7,13 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: [true, "Please Enter The Title"],
     },
+    propertyPrice: Number,
+    propertyRent: Number,
+    propertyStatus: {
+      type: String,
+    },
     propertyType: {
       type: String,
-      enum: ["commercial", "residential"],
     },
     propertyImages: [
       {
@@ -34,15 +38,20 @@ const propertySchema = new mongoose.Schema(
       bathrooms: {
         type: Number,
       },
-      description: {
-        type: String,
-      },
-      size: {
-        type: Number,
-      },
-      price: {
-        type: Number,
-      },
+      floorArea: [
+        {
+          description: {
+            type: String,
+          },
+          size: {
+            type: Number,
+          },
+          price: {
+            type: Number,
+          },
+          status: String,
+        },
+      ],
     },
     propertyAddress: {
       buildingNumber: String,
