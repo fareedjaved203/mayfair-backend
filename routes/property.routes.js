@@ -6,6 +6,8 @@ const {
   deleteProperty,
   updateProperty,
   shortlistProperties,
+  addPropertyToShortlist,
+  removePropertyFromShortlist,
 } = require("../controllers/property.controller.js");
 const {
   isAuthenticatedUser,
