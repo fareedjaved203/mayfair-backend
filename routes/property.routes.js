@@ -5,9 +5,6 @@ const {
   getProperty,
   deleteProperty,
   updateProperty,
-  shortlistProperties,
-  addPropertyToShortlist,
-  removePropertyFromShortlist,
 } = require("../controllers/property.controller.js");
 const {
   isAuthenticatedUser,
@@ -21,13 +18,5 @@ router.get("/", getAllProperties);
 router.get("/:id", getProperty);
 router.delete("/:id", isAuthenticatedUser, deleteProperty);
 router.put("/:id", isAuthenticatedUser, updateProperty);
-
-router.get("/shortlisted", isAuthenticatedUser, shortlistProperties);
-router.get("/shortlist/add", isAuthenticatedUser, addPropertyToShortlist);
-router.get(
-  "/shortlist/remove",
-  isAuthenticatedUser,
-  removePropertyFromShortlist
-);
 
 module.exports = router;

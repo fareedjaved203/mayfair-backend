@@ -35,15 +35,23 @@ const getAllProperties = async (req, res, next) => {
 
 const getProperty = async (req, res, next) => {
   try {
-    const { id } = req.params.id;
+    const { id } = req.params;
     const property = await Property.findById(id);
-    return res.status(200).json({
-      success: true,
-      property,
-    });
+    console.log(property);
+    if (property) {
+      return res.status(200).json({
+        success: true,
+        property,
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "Property Not Found",
+      });
+    }
   } catch (error) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: error.message,
     });
   }
@@ -71,7 +79,7 @@ const deleteProperty = async (req, res, next) => {
 
 const updateProperty = async (req, res, next) => {
   try {
-    const { id } = req.params.id;
+    const { id } = req.params;
     const property = await Property.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
@@ -92,94 +100,10 @@ const updateProperty = async (req, res, next) => {
   }
 };
 
-const shortlistProperties = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id).populate("shortlist");
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      properties: user.shortlist,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const addPropertyToShortlist = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    const propertyId = req.body.propertyId;
-    if (!user.shortlist.includes(propertyId)) {
-      user.shortlist.push(propertyId);
-      await user.save();
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Property added to shortlist",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const removePropertyFromShortlist = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    const propertyId = req.body.propertyId;
-    user.shortlist = user.shortlist.filter(
-      (property) => property.toString() !== propertyId
-    );
-    await user.save();
-
-    return res.status(200).json({
-      success: true,
-      message: "Property removed from shortlist",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
 module.exports = {
-  addPropertyToShortlist,
-  removePropertyFromShortlist,
   addProperty,
   getAllProperties,
   getProperty,
   deleteProperty,
   updateProperty,
-  shortlistProperties,
 };

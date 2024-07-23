@@ -7,6 +7,9 @@ const {
   verifyOTP,
   logout,
   getUserDetails,
+  shortlistProperties,
+  addPropertyToShortlist,
+  removePropertyFromShortlist,
 } = require("../controllers/user.controller.js");
 const { isAuthenticatedUser } = require("../middlewares/auth.middleware.js");
 
@@ -19,5 +22,13 @@ router.get("/logout", isAuthenticatedUser, logout);
 router.get("/my-profile", isAuthenticatedUser, getUserDetails);
 router.post("/password/forgot", forgotPassword);
 router.put("/password/reset/:token", resetPassword);
+
+router.get("/shortlist-properties", isAuthenticatedUser, shortlistProperties);
+router.post("/shortlist/add", isAuthenticatedUser, addPropertyToShortlist);
+router.delete(
+  "/shortlist/remove/:id",
+  isAuthenticatedUser,
+  removePropertyFromShortlist
+);
 
 module.exports = router;

@@ -6,6 +6,7 @@ const propertySchema = new mongoose.Schema(
     title: {
       type: String,
       required: [true, "Please Enter The Title"],
+      unique: true,
     },
     propertyPrice: Number,
     propertyRent: Number,
@@ -29,9 +30,6 @@ const propertySchema = new mongoose.Schema(
       default: "rent",
     },
     residentialPropertyDetails: {
-      status: {
-        type: String,
-      },
       bedrooms: {
         type: Number,
       },
@@ -46,9 +44,6 @@ const propertySchema = new mongoose.Schema(
           size: {
             type: Number,
           },
-          price: {
-            type: Number,
-          },
           status: String,
         },
       ],
@@ -58,14 +53,13 @@ const propertySchema = new mongoose.Schema(
       street: String,
       city: String,
       state: String,
-      zip: String,
+      zip: Number,
       location: String,
     },
     propertyDetails: {
       squareft: Number,
       startSize: Number,
       endSize: Number,
-      propertyLocation: String,
     },
     amenities: [
       {
