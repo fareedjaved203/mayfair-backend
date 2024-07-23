@@ -77,7 +77,7 @@ const getProperty = async (req, res, next) => {
 
 const deleteProperty = async (req, res, next) => {
   try {
-    const { id } = req.params.id;
+    const { id } = req.params;
     const property = await Property.findByIdAndDelete(id);
 
     if (!property) {
