@@ -1,5 +1,6 @@
 const Property = require("../models/property.model");
-const User = require("../models/user.model");
+const Amenity = require("../models/amenities.model");
+const PropertyType = require("../models/propertyType.model");
 
 const addProperty = async (req, res, next) => {
   try {
@@ -20,18 +21,77 @@ const addProperty = async (req, res, next) => {
 
 const getAllProperties = async (req, res, next) => {
   try {
-    const { title, city, zip, state, location, street, propertyOption } =
-      req.query;
+    const {
+      title,
+      city,
+      zip,
+      state,
+      location,
+      street,
+      propertyOption,
+      propertyStatus,
+      propertyType,
+      amenities,
+      squareft,
+      bedrooms,
+      bathrooms,
+      minRent,
+      maxRent,
+      minPrice,
+      maxPrice,
+    } = req.query;
 
     // Build the search query
     const query = {};
+
+    if (propertyType) {
+      const propertyTypeDoc = await PropertyType.findOne({
+        type: new RegExp(propertyType, "i"),
+      });
+      if (propertyTypeDoc) {
+        query.propertyType = propertyTypeDoc._id;
+      }
+    }
+
+    // Handle amenities
+    if (amenities) {
+      const amenityNames = amenities.split(",").map((a) => new RegExp(a, "i"));
+      const amenityDocs = await Amenity.find({ name: { $in: amenityNames } });
+      console.log("Amenity Docs:", amenityDocs); // Debugging log
+      if (amenityDocs.length) {
+        query.amenities = { $in: amenityDocs.map((amenity) => amenity._id) };
+      } else {
+        // If no amenities match, ensure the query will return no results
+        query.amenities = { $in: [] };
+      }
+    }
+
     if (title) query.title = new RegExp(title, "i");
     if (propertyOption) query.propertyOption = new RegExp(propertyOption, "i");
+    if (propertyStatus) query.propertyStatus = new RegExp(propertyStatus, "i");
     if (city) query["propertyAddress.city"] = new RegExp(city, "i");
     if (zip) query["propertyAddress.zip"] = zip;
     if (state) query["propertyAddress.state"] = state;
     if (location) query["propertyAddress.location"] = location;
     if (street) query["propertyAddress.street"] = street;
+
+    if (squareft) query["propertyDetails.squareft"] = { $gte: squareft };
+    if (bedrooms)
+      query["residentialPropertyDetails.bedrooms"] = { $gte: bedrooms };
+    if (bathrooms)
+      query["residentialPropertyDetails.bathrooms"] = { $gte: bathrooms };
+
+    if (minRent || maxRent) {
+      query.propertyRent = {};
+      if (minRent) query.propertyRent.$gte = minRent;
+      if (maxRent) query.propertyRent.$lte = maxRent;
+    }
+
+    if (minPrice || maxPrice) {
+      query.propertyPrice = {};
+      if (minPrice) query.propertyPrice.$gte = minPrice;
+      if (maxPrice) query.propertyPrice.$lte = maxPrice;
+    }
 
     const properties = await Property.find(query)
       .populate("amenities")
