@@ -14,7 +14,8 @@ const propertySchema = new mongoose.Schema(
       type: String,
     },
     propertyType: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PropertyType",
     },
     propertyImages: [
       {
@@ -63,7 +64,8 @@ const propertySchema = new mongoose.Schema(
     },
     amenities: [
       {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Amenity",
       },
     ],
     propertyDescription: String,

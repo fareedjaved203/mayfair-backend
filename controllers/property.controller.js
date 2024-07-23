@@ -33,7 +33,9 @@ const getAllProperties = async (req, res, next) => {
     if (location) query["propertyAddress.location"] = location;
     if (street) query["propertyAddress.street"] = street;
 
-    const properties = await Property.find(query);
+    const properties = await Property.find(query)
+      .populate("amenities")
+      .populate("propertyType");
     if (properties) {
       return res.status(200).json({
         success: true,
@@ -54,7 +56,9 @@ const getAllProperties = async (req, res, next) => {
 const getProperty = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const property = await Property.findById(id);
+    const property = await Property.findById(id)
+      .populate("amenities")
+      .populate("propertyType");
     console.log(property);
     if (property) {
       return res.status(200).json({
