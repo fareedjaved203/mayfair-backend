@@ -20,11 +20,13 @@ const addProperty = async (req, res, next) => {
 
 const getAllProperties = async (req, res, next) => {
   try {
-    const { title, city, zip, state, location, street } = req.query;
+    const { title, city, zip, state, location, street, propertyOption } =
+      req.query;
 
     // Build the search query
     const query = {};
-    if (title) query.title = new RegExp(title, "i"); // Case-insensitive search
+    if (title) query.title = new RegExp(title, "i");
+    if (propertyOption) query.propertyOption = new RegExp(propertyOption, "i");
     if (city) query["propertyAddress.city"] = new RegExp(city, "i");
     if (zip) query["propertyAddress.zip"] = zip;
     if (state) query["propertyAddress.state"] = state;
@@ -116,37 +118,10 @@ const updateProperty = async (req, res, next) => {
   }
 };
 
-const searchProperty = async (req, res, next) => {
-  try {
-    const { title, city, zip, state, location, street } = req.query;
-
-    // Build the search query
-    const query = {};
-    if (title) query.title = new RegExp(title, "i"); // Case-insensitive search
-    if (city) query["propertyAddress.city"] = new RegExp(city, "i");
-    if (zip) query["propertyAddress.zip"] = zip;
-    if (state) query["propertyAddress.state"] = state;
-    if (location) query["propertyAddress.location"] = location;
-    if (street) query["propertyAddress.street"] = street;
-
-    const properties = await Property.find(query);
-    res.status(200).json({
-      success: true,
-      properties,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
 module.exports = {
   addProperty,
   getAllProperties,
   getProperty,
   deleteProperty,
   updateProperty,
-  searchProperty,
 };

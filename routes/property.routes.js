@@ -5,7 +5,6 @@ const {
   getProperty,
   deleteProperty,
   updateProperty,
-  searchProperty,
 } = require("../controllers/property.controller.js");
 const {
   isAuthenticatedUser,
@@ -19,7 +18,5 @@ router.get("/", getAllProperties);
 router.get("/:id", getProperty);
 router.delete("/:id", isAuthenticatedUser, deleteProperty);
 router.put("/:id", isAuthenticatedUser, updateProperty);
-
-router.get("/search", searchProperty);
 
 module.exports = router;
