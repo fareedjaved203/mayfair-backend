@@ -10,10 +10,19 @@ const {
   isAuthenticatedUser,
   authorizeRoles,
 } = require("../middlewares/auth.middleware.js");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const router = express.Router();
 
-router.post("/", isAuthenticatedUser, authorizeRoles("admin"), addProperty);
+router.post(
+  "/",
+  isAuthenticatedUser,
+  authorizeRoles("admin"),
+  upload.array("propertyImages"),
+  addProperty
+);
 router.get("/", getAllProperties);
 router.get("/:id", getProperty);
 router.delete("/:id", isAuthenticatedUser, deleteProperty);

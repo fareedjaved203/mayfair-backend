@@ -1,10 +1,50 @@
 const Property = require("../models/property.model");
 const Amenity = require("../models/amenities.model");
+const multer = require("multer");
+
 const PropertyType = require("../models/propertyType.model");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+const s3Client = new S3Client({
+  region: "ams3",
+  endpoint: "https://ams3.digitaloceanspaces.com",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+  },
+});
 
 const addProperty = async (req, res, next) => {
   try {
+    let images = [];
+
+    const imageFiles = req.files; // Files from the request
+
+    // Read and upload each image to S3
+    await Promise.all(
+      imageFiles.map(async (file) => {
+        const putObjectCommand = new PutObjectCommand({
+          Bucket: process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES,
+          Key: `${file.originalname}`,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+          ACL: "public-read",
+        });
+
+        await s3Client.send(putObjectCommand);
+        const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES}.ams3.digitaloceanspaces.com/${file.originalname}`;
+        images.push(imageUrl);
+      })
+    );
+
+    // Add the image URLs to the propertyImages array
+    req.body.propertyImages = images;
+
     const property = await Property.create(req.body);
+
     if (property) {
       return res.status(200).json({
         success: true,
