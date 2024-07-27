@@ -5,9 +5,20 @@ const propertyTypeSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      required: [true, "Please Enter The Type"],
+      enum: ["commercial", "residential"],
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
       unique: true,
     },
+    amenities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Amenity",
+      },
+    ],
   },
   { timestamps: true }
 );

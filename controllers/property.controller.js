@@ -75,6 +75,7 @@ const getAllProperties = async (req, res, next) => {
       propertyOption,
       propertyStatus,
       propertyType,
+      propertySubType,
       amenities,
       squareft,
       bedrooms,
@@ -88,29 +89,39 @@ const getAllProperties = async (req, res, next) => {
     // Build the search query
     const query = {};
 
-    if (propertyType) {
+    if (propertySubType) {
       const propertyTypeDoc = await PropertyType.findOne({
-        type: new RegExp(propertyType, "i"),
-      });
+        name: new RegExp(propertySubType, "i"),
+      }).populate("amenities");
       if (propertyTypeDoc) {
-        query.propertyType = propertyTypeDoc._id;
+        query.propertySubType = propertyTypeDoc._id;
       }
     }
 
     // Handle amenities
     if (amenities) {
+      // Step 1: Split amenities and create regex patterns
       const amenityNames = amenities.split(",").map((a) => new RegExp(a, "i"));
+
+      // Step 2: Find amenity documents that match the criteria
       const amenityDocs = await Amenity.find({ name: { $in: amenityNames } });
-      console.log("Amenity Docs:", amenityDocs); // Debugging log
+
       if (amenityDocs.length) {
-        query.amenities = { $in: amenityDocs.map((amenity) => amenity._id) };
+        // Step 3: Get the IDs of property types that have the matching amenities
+        const propertyTypeIds = await PropertyType.find({
+          amenities: { $in: amenityDocs.map((amenity) => amenity._id) },
+        }).distinct("_id");
+
+        // Step 4: Query properties based on these property type IDs
+        query["propertySubType"] = { $in: propertyTypeIds };
       } else {
-        // If no amenities match, ensure the query will return no results
-        query.amenities = { $in: [] };
+        // Ensure the query returns no results if no amenities match
+        query["propertySubType"] = { $in: [] };
       }
     }
 
     if (title) query.title = new RegExp(title, "i");
+    if (propertyType) query.propertyType = new RegExp(propertyType, "i");
     if (propertyOption) query.propertyOption = new RegExp(propertyOption, "i");
     if (propertyStatus) query.propertyStatus = new RegExp(propertyStatus, "i");
     if (city) query["propertyAddress.city"] = new RegExp(city, "i");
@@ -138,8 +149,14 @@ const getAllProperties = async (req, res, next) => {
     }
 
     const properties = await Property.find(query)
-      .populate("amenities")
-      .populate("propertyType");
+      .populate({
+        path: "propertySubType",
+        populate: {
+          path: "amenities",
+        },
+      })
+      .exec();
+
     if (properties) {
       return res.status(200).json({
         success: true,

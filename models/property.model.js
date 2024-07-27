@@ -8,23 +8,26 @@ const propertySchema = new mongoose.Schema(
       required: [true, "Please Enter The Title"],
       unique: true,
     },
+    propertyType: {
+      type: String,
+      enum: ["commercial", "residential"],
+    },
     propertyPrice: Number,
     propertyRent: Number,
     propertyStatus: {
       type: String,
     },
-    propertyType: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PropertyType",
-    },
+    propertySubType: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PropertyType",
+      },
+    ],
     propertyImages: [
       {
         type: String,
       },
     ],
-    propertySubtype: {
-      type: String,
-    },
     propertyOption: {
       type: String,
       enum: ["buy", "rent"],
@@ -62,12 +65,6 @@ const propertySchema = new mongoose.Schema(
       startSize: Number,
       endSize: Number,
     },
-    amenities: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Amenity",
-      },
-    ],
     propertyDescription: String,
     facts: {
       title: String,

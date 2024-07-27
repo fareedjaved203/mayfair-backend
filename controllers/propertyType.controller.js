@@ -19,7 +19,7 @@ const addPropertyType = async (req, res, next) => {
 
 const getAllPropertyTypes = async (req, res, next) => {
   try {
-    const properties = await PropertyType.find({});
+    const properties = await PropertyType.find({}).populate("amenities");
     if (properties) {
       return res.status(200).json({
         success: true,
