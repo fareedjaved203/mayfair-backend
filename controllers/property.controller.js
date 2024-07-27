@@ -23,8 +23,10 @@ const addProperty = async (req, res, next) => {
 
     const imageFiles = req.files; // Files from the request
 
+    console.log(imageFiles);
+
     // Read and upload each image to S3
-    if (imageFiles.length >= 1) {
+    if (imageFiles || imageFiles?.length >= 1) {
       await Promise.all(
         imageFiles.map(async (file) => {
           const putObjectCommand = new PutObjectCommand({
@@ -55,7 +57,7 @@ const addProperty = async (req, res, next) => {
     }
   } catch (error) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: error.message,
     });
   }
