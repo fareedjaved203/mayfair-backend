@@ -24,24 +24,26 @@ const addProperty = async (req, res, next) => {
     const imageFiles = req.files; // Files from the request
 
     // Read and upload each image to S3
-    await Promise.all(
-      imageFiles.map(async (file) => {
-        const putObjectCommand = new PutObjectCommand({
-          Bucket: process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES,
-          Key: `${file.originalname}`,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-          ACL: "public-read",
-        });
+    if (imageFiles.length >= 1) {
+      await Promise.all(
+        imageFiles.map(async (file) => {
+          const putObjectCommand = new PutObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES,
+            Key: `${file.originalname}`,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+            ACL: "public-read",
+          });
 
-        await s3Client.send(putObjectCommand);
-        const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES}.ams3.digitaloceanspaces.com/${file.originalname}`;
-        images.push(imageUrl);
-      })
-    );
+          await s3Client.send(putObjectCommand);
+          const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES}.ams3.digitaloceanspaces.com/${file.originalname}`;
+          images.push(imageUrl);
+        })
+      );
 
-    // Add the image URLs to the propertyImages array
-    req.body.propertyImages = images;
+      // Add the image URLs to the propertyImages array
+      req.body.propertyImages = images;
+    }
 
     const property = await Property.create(req.body);
 
