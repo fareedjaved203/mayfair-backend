@@ -17,12 +17,11 @@ const propertySchema = new mongoose.Schema(
     propertyStatus: {
       type: String,
     },
-    propertySubType: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "PropertyType",
-      },
-    ],
+    propertySubType: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PropertyType",
+    },
+
     propertyImages: [
       {
         type: String,
