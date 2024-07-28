@@ -2,16 +2,36 @@ const PropertyType = require("../models/propertyType.model");
 
 const addPropertyType = async (req, res, next) => {
   try {
-    const property = await PropertyType.create(req.body);
-    if (property) {
-      return res.status(200).json({
-        success: true,
-        message: "Property Type Added Successfully",
+    const { type, name, amenities } = req.body;
+
+    // Validate input
+    if (!type || !name) {
+      return res.status(400).json({
+        success: false,
+        message: "Type and subtype are required.",
       });
     }
+
+    // Check for duplicate name within the same type
+    const existingProperty = await PropertyType.findOne({ type, name });
+    if (existingProperty) {
+      return res.status(400).json({
+        success: false,
+        message: "Property Sub type already exists for this type.",
+      });
+    }
+
+    // Add the new property
+    const property = await PropertyType.create(req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "Property Type Added Successfully",
+      property,
+    });
   } catch (error) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: error.message,
     });
   }
