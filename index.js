@@ -20,11 +20,13 @@ const user = require("./routes/user.routes");
 const property = require("./routes/property.routes");
 const amenities = require("./routes/amenities.routes");
 const propertyType = require("./routes/propertyType.routes");
+const blog = require("./routes/blog.routes");
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/property", property);
 app.use("/api/v1/amenities", amenities);
 app.use("/api/v1/propertyType", propertyType);
+app.use("/api/v1/blog", blog);
 
 app.listen(port, () => {
   console.log(`server is running at http://localhost:${port}`);

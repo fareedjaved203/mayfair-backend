@@ -1,11 +1,11 @@
 const express = require("express");
 const {
-  addProperty,
-  getAllProperties,
-  getProperty,
-  deleteProperty,
-  updateProperty,
-} = require("../controllers/property.controller.js");
+  addBlog,
+  getAllBlogs,
+  getBlog,
+  deleteBlog,
+  updateBlog,
+} = require("../controllers/blog.controller.js");
 const {
   isAuthenticatedUser,
   authorizeRoles,
@@ -20,19 +20,22 @@ router.post(
   "/",
   isAuthenticatedUser,
   authorizeRoles("admin"),
-  upload.array("propertyImages"),
-  addProperty
+  upload.array("blogImages"),
+  addBlog
 );
-router.get("/", getAllProperties);
-router.get("/:id", getProperty);
-router.delete("/:id", isAuthenticatedUser, deleteProperty);
+
+router.get("/", getAllBlogs);
+
+router.get("/:id", getBlog);
+
+router.delete("/:id", isAuthenticatedUser, deleteBlog);
 
 router.put(
-  "/:propertyId",
+  "/:id",
   isAuthenticatedUser,
   authorizeRoles("admin"),
-  upload.array("propertyImages"),
-  updateProperty
+  upload.array("blogImages"),
+  updateBlog
 );
 
 module.exports = router;

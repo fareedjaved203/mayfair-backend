@@ -23,8 +23,6 @@ const addProperty = async (req, res, next) => {
 
     const imageFiles = req.files; // Files from the request
 
-    console.log(imageFiles);
-
     // Read and upload each image to S3
     if (imageFiles || imageFiles?.length >= 1) {
       await Promise.all(
@@ -177,10 +175,7 @@ const getAllProperties = async (req, res, next) => {
 const getProperty = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const property = await Property.findById(id)
-      .populate("amenities")
-      .populate("propertyType");
-    console.log(property);
+    const property = await Property.findById(id).populate("propertySubType");
     if (property) {
       return res.status(200).json({
         success: true,
@@ -222,19 +217,58 @@ const deleteProperty = async (req, res, next) => {
 
 const updateProperty = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const property = await Property.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const propertyId = req.params.propertyId;
+    const property = await Property.findById(propertyId);
 
     if (!property) {
-      return res.status(404).send("Property not found");
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
     }
-    return res.status(200).json({
-      success: true,
-      message: "Property Updated Successfully",
-    });
+
+    let updatedImages = [];
+    let existingUrls = [];
+
+    if (req.body.propertyImages) {
+      existingUrls = req.body.propertyImages.filter(
+        (item) => typeof item === "string"
+      );
+    }
+
+    const imageFiles = req.files; // Files from the request
+    let newImages = [];
+
+    // Read and upload each image to S3
+    if (imageFiles || imageFiles?.length >= 1) {
+      await Promise.all(
+        imageFiles.map(async (file) => {
+          const putObjectCommand = new PutObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES,
+            Key: `${file.originalname}`,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+            ACL: "public-read",
+          });
+
+          await s3Client.send(putObjectCommand);
+          const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME_GENERATED_IMAGES}.ams3.digitaloceanspaces.com/${file.originalname}`;
+          newImages.push(imageUrl);
+        })
+      );
+    }
+    updatedImages = [...existingUrls, ...newImages];
+    property.propertyImages = updatedImages;
+
+    // Save the updated property
+    const propertySaved = await property.save();
+
+    if (propertySaved) {
+      return res.status(200).json({
+        success: true,
+        message: "Property updated successfully",
+      });
+    }
   } catch (error) {
     return res.status(500).json({
       success: false,
