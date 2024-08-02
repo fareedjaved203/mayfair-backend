@@ -21,9 +21,8 @@ const addProperty = async (req, res, next) => {
   try {
     let images = [];
 
-    const imageFiles = req.files; // Files from the request
+    const imageFiles = req.files;
 
-    // Read and upload each image to S3
     if (imageFiles || imageFiles?.length >= 1) {
       await Promise.all(
         imageFiles.map(async (file) => {
@@ -41,7 +40,6 @@ const addProperty = async (req, res, next) => {
         })
       );
 
-      // Add the image URLs to the propertyImages array
       req.body.propertyImages = images;
     }
 
@@ -84,7 +82,6 @@ const getAllProperties = async (req, res, next) => {
       maxPrice,
     } = req.query;
 
-    // Build the search query
     const query = {};
 
     if (propertySubType) {
@@ -96,24 +93,18 @@ const getAllProperties = async (req, res, next) => {
       }
     }
 
-    // Handle amenities
     if (amenities) {
-      // Step 1: Split amenities and create regex patterns
       const amenityNames = amenities.split(",").map((a) => new RegExp(a, "i"));
 
-      // Step 2: Find amenity documents that match the criteria
       const amenityDocs = await Amenity.find({ name: { $in: amenityNames } });
 
       if (amenityDocs.length) {
-        // Step 3: Get the IDs of property types that have the matching amenities
         const propertyTypeIds = await PropertyType.find({
           amenities: { $in: amenityDocs.map((amenity) => amenity._id) },
         }).distinct("_id");
 
-        // Step 4: Query properties based on these property type IDs
         query["propertySubType"] = { $in: propertyTypeIds };
       } else {
-        // Ensure the query returns no results if no amenities match
         query["propertySubType"] = { $in: [] };
       }
     }
@@ -236,10 +227,9 @@ const updateProperty = async (req, res, next) => {
       );
     }
 
-    const imageFiles = req.files; // Files from the request
+    const imageFiles = req.files;
     let newImages = [];
 
-    // Read and upload each image to S3
     if (imageFiles || imageFiles?.length >= 1) {
       await Promise.all(
         imageFiles.map(async (file) => {
@@ -260,7 +250,6 @@ const updateProperty = async (req, res, next) => {
     updatedImages = [...existingUrls, ...newImages];
     property.propertyImages = updatedImages;
 
-    // Save the updated property
     const propertySaved = await property.save();
 
     if (propertySaved) {

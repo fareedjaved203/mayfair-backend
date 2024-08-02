@@ -4,7 +4,6 @@ const addPropertyType = async (req, res, next) => {
   try {
     const { type, name, amenities } = req.body;
 
-    // Validate input
     if (!type || !name) {
       return res.status(400).json({
         success: false,
@@ -12,7 +11,6 @@ const addPropertyType = async (req, res, next) => {
       });
     }
 
-    // Check for duplicate name within the same type
     const existingProperty = await PropertyType.findOne({ type, name });
     if (existingProperty) {
       return res.status(400).json({
@@ -21,7 +19,6 @@ const addPropertyType = async (req, res, next) => {
       });
     }
 
-    // Add the new property
     const property = await PropertyType.create(req.body);
 
     return res.status(200).json({

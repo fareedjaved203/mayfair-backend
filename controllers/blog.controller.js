@@ -16,9 +16,8 @@ const addBlog = async (req, res, next) => {
   try {
     let images = [];
 
-    const imageFiles = req.files; // Files from the request
+    const imageFiles = req.files;
 
-    // Read and upload each image to S3
     if (imageFiles || imageFiles?.length >= 1) {
       await Promise.all(
         imageFiles.map(async (file) => {
@@ -36,7 +35,6 @@ const addBlog = async (req, res, next) => {
         })
       );
 
-      // Add the image URLs to the propertyImages array
       req.body.blogImages = images;
     }
 
@@ -60,7 +58,6 @@ const getAllBlogs = async (req, res, next) => {
   try {
     const { title, description } = req.query;
 
-    // Build the search query
     const query = {};
 
     if (title) query.title = new RegExp(title, "i");
@@ -135,9 +132,8 @@ const updateBlog = async (req, res, next) => {
 
     let images = [];
 
-    const imageFiles = req.files; // Files from the request
+    const imageFiles = req.files;
 
-    // Read and upload each image to S3
     if (imageFiles || imageFiles?.length >= 1) {
       await Promise.all(
         imageFiles.map(async (file) => {
@@ -155,7 +151,6 @@ const updateBlog = async (req, res, next) => {
         })
       );
 
-      // Add the image URLs to the propertyImages array
       req.body.blogImages = images;
     }
 
