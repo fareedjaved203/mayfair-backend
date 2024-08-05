@@ -19,6 +19,14 @@ const s3Client = new S3Client({
 
 const addProperty = async (req, res, next) => {
   try {
+    existingTitle = await Property.findOne({ title: req.body.title });
+    if (existingTitle) {
+      return res.status(409).json({
+        success: false,
+        message: "Property with same title already added",
+      });
+    }
+
     let images = [];
 
     const imageFiles = req.files;
