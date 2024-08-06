@@ -27,8 +27,6 @@ const addProperty = async (req, res, next) => {
       });
     }
 
-    console.log(req.body);
-
     let images = [];
 
     const imageFiles = req.files;
@@ -53,7 +51,58 @@ const addProperty = async (req, res, next) => {
       req.body.propertyImages = images;
     }
 
-    const property = await Property.create(req.body);
+    const {
+      title,
+      propertyType,
+      propertyOption,
+      propertySubType,
+      residentialPropertyDetails,
+      propertyAddress,
+      propertyDetails,
+      propertyRent,
+      propertyPrice,
+      amenties,
+      propertyDescription,
+      facts,
+      location,
+      specialOffers,
+      propertyStatus,
+    } = req.body;
+
+    const parsedResidentialPropertyDetails = JSON.parse(
+      residentialPropertyDetails
+    );
+    const parsedPropertyAddress = JSON.parse(propertyAddress);
+    const parsedPropertyDetails = JSON.parse(propertyDetails);
+    const parsedAmenties = JSON.parse(amenties);
+    const parsedFacts = JSON.parse(facts);
+    const parsedLocation = JSON.parse(location);
+    const parsedPrivateOffice = JSON.parse(privateOffice);
+    const parsedSpecialOffers = JSON.parse(specialOffers);
+
+    const newProperty = new Property({
+      title,
+      propertyType,
+      propertyOption,
+      propertySubType,
+      residentialPropertyDetails: parsedResidentialPropertyDetails,
+      propertyAddress: parsedPropertyAddress,
+      propertyDetails: parsedPropertyDetails,
+      propertyRent,
+      propertyPrice,
+      amenties: parsedAmenties,
+      propertyDescription,
+      facts: parsedFacts,
+      location: parsedLocation,
+      privateOffice: parsedPrivateOffice,
+      specialOffers: parsedSpecialOffers,
+      propertyStatus,
+      propertyImages: images,
+    });
+
+    console.log("newProperty:", newProperty);
+
+    const property = await Property.create(newProperty);
 
     if (property) {
       return res.status(200).json({
