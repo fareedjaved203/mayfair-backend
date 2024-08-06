@@ -78,13 +78,18 @@ const addProperty = async (req, res, next) => {
     const parsedFacts = JSON.parse(facts);
     const parsedLocation = JSON.parse(location);
     const parsedSpecialOffers = JSON.parse(specialOffers);
+    const transportOption = parsedLocation.transportOptions;
+    const floorArea = parsedResidentialPropertyDetails.floorArea;
 
-    const newProperty = new Property({
+    let newProperty = new Property({
       title,
       propertyType,
       propertyOption,
       propertySubType,
-      residentialPropertyDetails: parsedResidentialPropertyDetails,
+      residentialPropertyDetails: {
+        ...parsedResidentialPropertyDetails,
+        floorArea,
+      },
       propertyAddress: parsedPropertyAddress,
       propertyDetails: parsedPropertyDetails,
       propertyRent,
@@ -92,11 +97,18 @@ const addProperty = async (req, res, next) => {
       amenties: parsedAmenties,
       propertyDescription,
       facts: parsedFacts,
-      location: parsedLocation,
+      location: {
+        ...parsedLocation,
+        transportOption,
+      },
       specialOffers: parsedSpecialOffers,
       propertyStatus,
       propertyImages: images,
     });
+
+    newProperty = Object.fromEntries(
+      Object.entries(newProperty).filter(([_, v]) => v)
+    );
 
     console.log("newProperty:", newProperty);
 
