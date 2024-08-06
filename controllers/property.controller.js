@@ -27,6 +27,8 @@ const addProperty = async (req, res, next) => {
       });
     }
 
+    console.log(req.body);
+
     let images = [];
 
     const imageFiles = req.files;
