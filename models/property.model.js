@@ -72,11 +72,17 @@ const propertySchema = new mongoose.Schema(
     location: {
       latitude: String,
       longitude: String,
-      transportOption: [
+      transportOptions: [
         {
-          name: String,
-          distance: String,
-          type: String,
+          name: {
+            type: String,
+          },
+          distance: {
+            type: String,
+          },
+          type: {
+            type: String,
+          },
         },
       ],
     },

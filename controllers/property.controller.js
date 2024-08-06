@@ -78,8 +78,9 @@ const addProperty = async (req, res, next) => {
     const parsedFacts = JSON.parse(facts);
     const parsedLocation = JSON.parse(location);
     const parsedSpecialOffers = JSON.parse(specialOffers);
-    const transportOption = parsedLocation.transportOptions;
-    const floorArea = parsedResidentialPropertyDetails.floorArea;
+
+    console.log(parsedResidentialPropertyDetails);
+    console.log(parsedLocation);
 
     let newProperty = new Property({
       title,
@@ -87,8 +88,8 @@ const addProperty = async (req, res, next) => {
       propertyOption,
       propertySubType,
       residentialPropertyDetails: {
+        floorArea: parsedResidentialPropertyDetails.floorArea,
         ...parsedResidentialPropertyDetails,
-        floorArea,
       },
       propertyAddress: parsedPropertyAddress,
       propertyDetails: parsedPropertyDetails,
@@ -98,19 +99,16 @@ const addProperty = async (req, res, next) => {
       propertyDescription,
       facts: parsedFacts,
       location: {
-        ...parsedLocation,
-        transportOption,
+        latitude: parsedLocation.latitude,
+        longitude: parsedLocation.longitude,
+        transportOptions: parsedLocation.transportOptions,
       },
       specialOffers: parsedSpecialOffers,
       propertyStatus,
       propertyImages: images,
     });
 
-    newProperty = Object.fromEntries(
-      Object.entries(newProperty).filter(([_, v]) => v)
-    );
-
-    console.log("newProperty:", newProperty);
+    console.log(newProperty);
 
     const property = await Property.create(newProperty);
 
