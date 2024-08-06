@@ -77,7 +77,6 @@ const addProperty = async (req, res, next) => {
     const parsedAmenties = JSON.parse(amenties);
     const parsedFacts = JSON.parse(facts);
     const parsedLocation = JSON.parse(location);
-    const parsedPrivateOffice = JSON.parse(privateOffice);
     const parsedSpecialOffers = JSON.parse(specialOffers);
 
     const newProperty = new Property({
@@ -94,7 +93,6 @@ const addProperty = async (req, res, next) => {
       propertyDescription,
       facts: parsedFacts,
       location: parsedLocation,
-      privateOffice: parsedPrivateOffice,
       specialOffers: parsedSpecialOffers,
       propertyStatus,
       propertyImages: images,
